@@ -107,5 +107,26 @@ describe('app routes', () => {
 
       expect(data.body).toEqual(expectation);
     });
+
+    test('returns Old Fashioned doughnut', async() => {
+
+      const expectation = 
+        {
+          id: 2,
+          name: 'Old-Fashioned',
+          description: 'Doughnut made with sour cream and a tapered edge',
+          specialty: false,
+          price: '0.60',
+          owner_id: 1
+        }
+      ;
+
+      const data = await fakeRequest(app)
+        .get('/doughnuts/2')
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(data.body).toEqual(expectation);
+    });
   });
 });
