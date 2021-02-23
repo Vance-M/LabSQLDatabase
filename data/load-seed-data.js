@@ -27,10 +27,11 @@ async function run() {
     await Promise.all(
       doughnuts.map(doughnut => {
         return client.query(`
-                    INSERT INTO doughnuts (name, description, specialty, price, owner_id)
-                    VALUES ($1, $2, $3, $4, $5);
+                    INSERT INTO doughnuts (id, name, description, specialty, price, owner_id)
+                    VALUES ($1, $2, $3, $4, $5, $6);
                 `,
         [
+          doughnut.id,
           doughnut.name,
           doughnut.description,
           doughnut.specialty,
