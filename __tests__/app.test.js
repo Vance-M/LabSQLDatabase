@@ -31,35 +31,195 @@ describe('app routes', () => {
       return client.end(done);
     });
 
-    test('returns animals', async() => {
+    test('returns doughnuts', async() => {
 
       const expectation = [
         {
           'id': 1,
-          'name': 'bessie',
-          'coolfactor': 3,
-          'owner_id': 1
+          'name': 'Glazed',
+          'baked_by_id': 1,
+          'specialty': false,
+          'price': '0.50',
+          'owner_id': 1,
+          'baker': 'Juan',
         },
         {
           'id': 2,
-          'name': 'jumpy',
-          'coolfactor': 4,
-          'owner_id': 1
+          'name': 'Old-Fashioned',
+          'baked_by_id': 1,
+          'specialty': false,
+          'price': '0.60',
+          'owner_id': 1,
+          'baker': 'Juan',
         },
         {
           'id': 3,
-          'name': 'spot',
-          'coolfactor': 10,
-          'owner_id': 1
+          'name': 'Cake',
+          'baked_by_id': 2,
+          'specialty': false,
+          'price': '0.75',
+          'owner_id': 1,
+          'baker': 'Twain',
+        },
+        {
+          'id': 4,
+          'name': 'Buttermilk',
+          'baked_by_id': 2,
+          'specialty': true,
+          'price': '1.00',
+          'owner_id': 1,
+          'baker': 'Twain',
+        },
+        {
+          'id': 5,
+          'name': 'Bearclaw',
+          'baked_by_id': 3,
+          'specialty': true,
+          'price': '1.50',
+          'owner_id': 1,
+          'baker': 'Tressa',
+        },
+        {
+          'id': 6,
+          'name': 'Cruller',
+          'baked_by_id': 3,
+          'specialty': true,
+          'price': '1.00',
+          'owner_id': 1,
+          'baker': 'Tressa',
+        },
+        {
+          'id': 7,
+          'name': 'Maple Bar',
+          'baked_by_id': 4,
+          'specialty': false,
+          'price': '0.75',
+          'owner_id': 1,
+          'baker': 'Ivy',
+        },
+        {
+          'id': 8,
+          'name': 'Sprinkles',
+          'baked_by_id': 4,
+          'specialty': false,
+          'price': '0.60',
+          'owner_id': 1,
+          'baker': 'Ivy',
         }
       ];
 
       const data = await fakeRequest(app)
-        .get('/animals')
+        .get('/doughnuts')
         .expect('Content-Type', /json/)
         .expect(200);
 
       expect(data.body).toEqual(expectation);
     });
+
+    test('returns Old Fashioned doughnut', async() => {
+
+      const expectation = 
+      {
+        'id': 2,
+        'name': 'Old-Fashioned',
+        'baked_by_id': 1,
+        'specialty': false,
+        'price': '0.60',
+        // 'owner_id': 1,
+        'baker': 'Juan',
+      }
+      ;
+
+      const data = await fakeRequest(app)
+        .get('/doughnuts/2')
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(data.body).toEqual(expectation);
+    });
+
+    test('adds Jelly-filled doughnut to the list', async() => {
+      const newDonut = {
+        name: 'Jelly-filled',
+        baked_by_id: 4,
+        specialty: true,
+        price: '1.00',
+        // baker: 'Ivy',
+      };
+      const expectation = {
+        ...newDonut,
+        id: 9,
+        owner_id: 1
+      };
+      const data = await fakeRequest(app)
+        .post('/doughnuts')
+        .send(newDonut)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(data.body).toEqual(expectation);
+
+      const allDoughnuts = await fakeRequest(app)
+        .get('/doughnuts')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      const newexpectation = {
+        ...expectation,
+        baker: 'Ivy',
+      };
+      const jellyFilled = allDoughnuts.body.find(doughnut => doughnut.name === 'Jelly-filled');
+
+      expect(jellyFilled).toEqual(newexpectation);
+    });
+
+    test('updates the price of a doughnut', async() =>{
+      const newDoughnut = {
+        name: 'Cruller',
+        baked_by_id: 3,
+        specialty: true,
+        price: '0.75',
+        baker: 'Tressa',
+      };
+
+      const expectation = {
+        ...newDoughnut,
+        id: 6,
+      };
+
+      await fakeRequest(app)
+        .put('/doughnuts/6')
+        .send(newDoughnut)
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      const updatedDoughnut = await fakeRequest(app)
+        .get('/doughnuts/6')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(updatedDoughnut.body).toEqual(expectation);
+    });
+
+    test('deletes a doughnut from the list', async() => {
+      const expectation = {
+        id: 2,
+        name: 'Old-Fashioned',
+        baked_by_id: 1,
+        specialty: false,
+        price: '0.60',
+        owner_id: 1,
+      };
+
+      const data = await fakeRequest(app)
+        .delete('/doughnuts/2')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(data.body).toEqual(expectation);
+
+      const empty = await fakeRequest(app)
+        .get('/doughnuts/2')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(empty.body).toEqual('');
+    });
   });
+
 });
