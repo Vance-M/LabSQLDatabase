@@ -13,14 +13,18 @@ async function run() {
     // run a query to create tables
     await client.query(`
                 CREATE TABLE users (
-                    id SERIAL PRIMARY KEY,
+                    id SERIAL PRIMARY KEY NOT NULL,
                     email VARCHAR(256) NOT NULL,
                     hash VARCHAR(512) NOT NULL
                 );           
+                CREATE TABLE bakers (
+                  id SERIAL PRIMARY KEY NOT NULL,
+                  baked_by VARCHAR(512) NOT NULL
+                );
                 CREATE TABLE doughnuts (
                     id SERIAL PRIMARY KEY NOT NULL,
                     name VARCHAR(512) NOT NULL,
-                    description VARCHAR(512) NOT NULL,
+                    baked_by_id INTEGER NOT NULL REFERENCES bakers(id),
                     specialty BOOLEAN NOT NULL,
                     price DECIMAL NOT NULL,
                     owner_id INTEGER NOT NULL REFERENCES users(id)
