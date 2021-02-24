@@ -41,7 +41,7 @@ describe('app routes', () => {
           'specialty': false,
           'price': '0.50',
           'owner_id': 1,
-          'baked_by': 'Juan',
+          'baker': 'Juan',
         },
         {
           'id': 2,
@@ -50,7 +50,7 @@ describe('app routes', () => {
           'specialty': false,
           'price': '0.60',
           'owner_id': 1,
-          'baked_by': 'Juan',
+          'baker': 'Juan',
         },
         {
           'id': 3,
@@ -59,7 +59,7 @@ describe('app routes', () => {
           'specialty': false,
           'price': '0.75',
           'owner_id': 1,
-          'baked_by': 'Twain',
+          'baker': 'Twain',
         },
         {
           'id': 4,
@@ -68,7 +68,7 @@ describe('app routes', () => {
           'specialty': true,
           'price': '1.00',
           'owner_id': 1,
-          'baked_by': 'Twain',
+          'baker': 'Twain',
         },
         {
           'id': 5,
@@ -77,7 +77,7 @@ describe('app routes', () => {
           'specialty': true,
           'price': '1.50',
           'owner_id': 1,
-          'baked_by': 'Tressa',
+          'baker': 'Tressa',
         },
         {
           'id': 6,
@@ -86,7 +86,7 @@ describe('app routes', () => {
           'specialty': true,
           'price': '1.00',
           'owner_id': 1,
-          'baked_by': 'Tressa',
+          'baker': 'Tressa',
         },
         {
           'id': 7,
@@ -95,7 +95,7 @@ describe('app routes', () => {
           'specialty': false,
           'price': '0.75',
           'owner_id': 1,
-          'baked_by': 'Ivy',
+          'baker': 'Ivy',
         },
         {
           'id': 8,
@@ -104,7 +104,7 @@ describe('app routes', () => {
           'specialty': false,
           'price': '0.60',
           'owner_id': 1,
-          'baked_by': 'Ivy',
+          'baker': 'Ivy',
         }
       ];
 
@@ -125,8 +125,8 @@ describe('app routes', () => {
         'baked_by_id': 1,
         'specialty': false,
         'price': '0.60',
-        'owner_id': 1,
-        'baked_by': 'Juan',
+        // 'owner_id': 1,
+        'baker': 'Juan',
       }
       ;
 
@@ -138,38 +138,41 @@ describe('app routes', () => {
       expect(data.body).toEqual(expectation);
     });
 
-    // test('adds Jelly-filled doughnut to the list', async() => {
-    //   const newDonut = {
-    //     id: 9,
-    //     name: 'Jelly-filled',
-    //     baked_by_id: 4,
-    //     specialty: true,
-    //     price: '1.00',
-    //     owner_id: 1,
-    //     baked_by: 'Ivy',
-    //   };
-    //   const expectation = {
-    //     ...newDonut,
-    //   };
-    //   const data = await fakeRequest(app)
-    //     .post('/doughnuts')
-    //     .send(newDonut)
-    //     .expect('Content-Type', /json/)
-    //     .expect(200);
-    //   expect(data.body).toEqual(expectation);
+    test('adds Jelly-filled doughnut to the list', async() => {
+      const newDonut = {
+        name: 'Jelly-filled',
+        baked_by_id: 4,
+        specialty: true,
+        price: '1.00',
+        // baker: 'Ivy',
+      };
+      const expectation = {
+        ...newDonut,
+        id: 9,
+        owner_id: 1
+      };
+      const data = await fakeRequest(app)
+        .post('/doughnuts')
+        .send(newDonut)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(data.body).toEqual(expectation);
 
-    //   const allDoughnuts = await fakeRequest(app)
-    //     .get('/doughnuts')
-    //     .expect('Content-Type', /json/)
-    //     .expect(200);
-    //   const jellyFilled = allDoughnuts.body.find(doughnut => doughnut.name === 'Jelly-filled');
+      const allDoughnuts = await fakeRequest(app)
+        .get('/doughnuts')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      const newexpectation = {
+        ...expectation,
+        baker: 'Ivy',
+      };
+      const jellyFilled = allDoughnuts.body.find(doughnut => doughnut.name === 'Jelly-filled');
 
-    //   expect(jellyFilled).toEqual(expectation);
-    // });
+      expect(jellyFilled).toEqual(newexpectation);
+    });
 
     test('updates the price of a doughnut', async() =>{
       const newDoughnut = {
-        id: 6,
         name: 'Cruller',
         baked_by_id: 3,
         specialty: true,
@@ -179,6 +182,7 @@ describe('app routes', () => {
 
       const expectation = {
         ...newDoughnut,
+        id: 6,
       };
 
       await fakeRequest(app)
@@ -194,28 +198,28 @@ describe('app routes', () => {
       expect(updatedDoughnut.body).toEqual(expectation);
     });
 
-    // test('deletes a doughnut from the list', async() => {
-    //   const expectation = {
-    //     id: 2,
-    //     name: 'Old-Fashioned',
-    //     baked_by_id: 1,
-    //     specialty: false,
-    //     price: '0.60',
-    //     owner_id: 1,
-    //   };
+    test('deletes a doughnut from the list', async() => {
+      const expectation = {
+        id: 2,
+        name: 'Old-Fashioned',
+        baked_by_id: 1,
+        specialty: false,
+        price: '0.60',
+        owner_id: 1,
+      };
 
-    //   const data = await fakeRequest(app)
-    //     .delete('/doughnuts/2')
-    //     .expect('Content-Type', /json/)
-    //     .expect(200);
-    //   expect(data.body).toEqual(expectation);
+      const data = await fakeRequest(app)
+        .delete('/doughnuts/2')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(data.body).toEqual(expectation);
 
-    //   const empty = await fakeRequest(app)
-    //     .get('/doughnuts/2')
-    //     .expect('Content-Type', /json/)
-    //     .expect(200);
-    //   expect(empty.body).toEqual('');
-    // });
+      const empty = await fakeRequest(app)
+        .get('/doughnuts/2')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(empty.body).toEqual('');
+    });
   });
 
 });
